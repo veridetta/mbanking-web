@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Transactions;
 use App\Http\Requests\StoreTransactionsRequest;
 use App\Http\Requests\UpdateTransactionsRequest;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionsController extends Controller
 {
@@ -47,7 +51,10 @@ class TransactionsController extends Controller
      */
     public function show(Transactions $transactions)
     {
-        //
+        //get sesi dari user
+        $user = auth()->user();
+        //ke halaman transaksi
+        return view('pages.transaction',['user'=>$user]);
     }
 
     /**
@@ -82,5 +89,150 @@ class TransactionsController extends Controller
     public function destroy(Transactions $transactions)
     {
         //
+    }
+    public function card(Request $request){
+        $status="failed";
+        $message="Data tidak ditemukan.";
+        //cek user database
+        $users=User::where('card','=',$request->card)->first();
+        //array data dummy
+        $kosong=array(
+            'id' => 1,
+            'name' => 'Tidak ada data',
+            'nik' => 43,
+            'tel' => 257,
+            'card' => 5602242014592959,
+            'email' => '',
+            'username' => '',
+            'status' => '',
+            'created_at' => '-000001-11-30T00:00:00.000000Z',
+            'updated_at' => '-000001-11-30T00:00:00.000000Z',
+        );
+        //jika ada data
+        if($users){
+            $status='success';
+            $message='Berhasil mendapatkan data';
+            //response
+            return response()->json(['status'=> $status, 'messages'=>$message, 'data'=> $users]);
+        }else{
+            return response()->json(['status'=> $status, 'messages'=>$message, 'data'=> $kosong]);
+        }
+    }
+
+    public function transfer(Request $request){
+        //validasi form
+        $validator = Validator::make($request->all(), [
+            'users_id' => 'required',
+            'credit' => 'required',
+            'from' => 'required',
+            'dest' => 'required',
+            'desc' => 'required',
+        ]);
+        //jika gagal
+        if ($validator->fails()) {
+            return response()->json(['status'=> "Error", 'messages'=>"", 'data'=> "Tidak dapat memvalidasi data"]);
+        }
+        //cek transaksi terakhir
+        $last=Transactions::where('users_id','=',$request->users_id)->orderBy('id','desc')->first();
+
+        //variabel saldo
+        if($last){
+            $sal=$last->saldo;
+        }else{
+            $sal=0;
+        }
+        //estimasi saldo setelah transaksi
+        $saldo = $sal+$request->debit-$request->credit;
+        //mengambil data tujuan
+        $dest = User::where('card','=',$request->dest)->first();
+        //ambil transaksi terakhir tujuan
+        $last2=Transactions::where('users_id','=',$dest->id)->orderBy('id','desc')->first();
+        //saldo tujuan
+                if($last){
+                    $sal2=$last2->saldo;
+                }else{
+                    $sal2=0;
+                }
+                //cek saldo masih cukup
+                if($request->credit < $sal2){
+                    //input database pengirim
+                    $verifications=Transactions::updateOrCreate([
+                        'id' => $request->id
+                       ],[
+                        'users_id' => $request->users_id,
+                            'debit' => 0,
+                            'credit' => $request->credit,
+                            'saldo' => $saldo,
+                            'from' => $request->from,
+                            'dest' => $request->dest,
+                            'desc' => $request->desc,
+                    ]);
+                    $status='success';
+                    $message='Data berhasil disimpan';
+                    //update saldo;
+                    $saldo2 = $sal2-$request->credit;
+                    //input data penerima
+                    $verifications=Transactions::create([
+                        'users_id' => $dest->id,
+                        'debit' => $request->credit,
+                        'credit' =>0,
+                        'saldo' => $saldo2,
+                        'from' => $request->from,
+                        'dest' => $request->dest,
+                        'desc' => $request->desc,
+                    ]);
+                }
+                //ubah format untuk bukti transfer
+        $date = Carbon::parse($verifications->created_at)->format("Y-mm-dd");
+        $date_trans = Carbon::parse($verifications->created_at)->format("dd-M-Y");
+        $no_trans="HANBDB".$date.$verifications->id;
+        $nominal = 0;
+
+        if($verifications->debit>0){
+            $nominal = $verifications->debit;
+        }else{
+            $nominal =$verifications->credit;
+        }
+        //data akan di return
+        $ret = '<table>
+        <tbody>
+            <tr class="text-sm">
+                <td>No Trans </td>
+                <td>: '.$no_trans.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Tanggal </td>
+                <td>: '.$date_trans.'</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <p class="h5 text-success text-center">Transaksi Berhasil</p>
+    <p class="text-sm">Transaksi telah berhasil dilakukan dengan rincian sebagai berikut.</p>
+    <table>
+        <tbody>
+            <tr class="text-sm">
+                <td>Nama Penerima </td>
+                <td>: '.$dest->name.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>No Rek </td>
+                <td>: '.$dest->card.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Nominal </td>
+                <td class="text-success font-weight-bolder">: Rp. '.number_format($nominal,0,',','.').'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Berita </td>
+                <td>: '.$verifications->desc.'</td>
+            </tr>
+        </tbody>
+    </table>
+    <small>Terus perbanyak transaksi dan rasakan kenyamanan yang terbaik dari kami.</small>
+    <hr>
+    <p class="text-center h4 font-weight-bolder text-primary">HINADADE BANK</p>';
+    //return response
+    return response()->json(['status'=> 'success', 'messages'=>'berhasil', 'data'=> $ret]);
     }
 }

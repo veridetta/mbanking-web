@@ -40,8 +40,9 @@
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             @endif
-            @include('layouts.navbars.auth.sidenav')
-                <main id="ps-remover" class="main-content" style="padding-left:15.125rem !important; margin-left:0px !important">
+            @include('layouts.navbars.auth.navbar')
+                <main id="ps-remover" class="main-content pt-20" style="padding-top:67px">
+                    @include('components.alert')
                     @yield('content')
                 </main>
 
@@ -65,6 +66,9 @@
                 damping: '0.5'
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+        function logout(){
+            $('#btn-logout').trigger('click');
         }
     </script>
     <!-- Github buttons -->
