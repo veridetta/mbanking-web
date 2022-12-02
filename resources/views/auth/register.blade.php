@@ -24,35 +24,35 @@
                                 @csrf
                                 <div class="flex flex-col mb-3">
                                     <label for="name">Nama Sesuai KTP</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Nama Lengkap" aria-label="Name" value="{{ old('name') }}" >
+                                    <input type="text" required name="name" class="form-control" placeholder="Nama Lengkap" aria-label="Name" value="{{ old('name') }}">
                                     @error('name') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="flex flex-col mb-3">
                                     <label for="nik">NIK</label>
-                                    <input type="number" name="nik" class="form-control" placeholder="NIK" aria-label="Nik" value="{{ old('nik') }}" >
+                                    <input type="number" required name="nik" class="form-control" placeholder="NIK" aria-label="Nik" value="{{ old('nik') }}" >
                                     @error('number') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="flex flex-col mb-3">
                                     <label for="nik">Nomor Telepon</label>
-                                    <input type="tel" name="tel" class="form-control" placeholder="Tel/HP" aria-label="Tel" value="{{ old('tel') }}" >
+                                    <input type="tel" name="tel" class="form-control"  required placeholder="Tel/HP" aria-label="Tel" value="{{ old('tel') }}" >
                                     @error('tel') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="flex flex-col mb-3">
                                     <label for="card">No Kartu</label>
-                                    <input type="card" name="card" class="form-control" placeholder="Nomor Kartu" aria-label="Kartu" value="{{ old('card') }}" >
+                                    <input type="card" name="card" class="form-control" required placeholder="Nomor Kartu" aria-label="Kartu" value="{{ old('card') }}" >
                                     @error('card') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <hr>
                                 <div class="flex flex-col mb-3">
-                                    <input type="email" name="email" class="form-control" placeholder="Email" aria-label="Email" value="{{ old('email') }}" >
+                                    <input type="email" name="email" class="form-control" placeholder="Email" required aria-label="Email" value="{{ old('email') }}" >
                                     @error('email') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="flex flex-col mb-3">
-                                    <input type="text" name="username" class="form-control" placeholder="Username" aria-label="username" value="{{ old('username') }}" >
+                                    <input type="text" name="username" class="form-control" placeholder="Username" required aria-label="username" value="{{ old('username') }}" >
                                     @error('username') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="flex flex-col mb-3">
-                                    <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password">
+                                    <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password" required>
                                     @error('password') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                 </div>
                                 <div class="form-check form-check-info text-start">
