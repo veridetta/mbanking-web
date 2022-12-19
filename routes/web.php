@@ -38,9 +38,13 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/users_delete/{users_id}', [LoginController::class, 'delete_users'])->name('users_delete');
 	
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+	Route::get('/admin', [TransactionsController::class, 'admin'])->name('admin');
+	Route::get('/verif/{users_id}', [TransactionsController::class, 'verif'])->name('verif');
 
 	Route::get('/transaction', [TransactionsController::class, 'show'])->name('transaction');
 	Route::post('/transaction_card', [TransactionsController::class, 'card'])->name('card_check');
 	Route::post('/transfer', [TransactionsController::class, 'transfer'])->name('transfer');
+	Route::get('/saldo', [TransactionsController::class, 'show_saldo'])->name('saldo');
+	Route::post('/topup', [TransactionsController::class, 'topup'])->name('topup');
 	
 });

@@ -115,9 +115,6 @@
                                 <i class="fa fa-user text-xl text-dark opacity-10" aria-hidden="true"></i>
                             </div>
                         </div>
-                    <div class="text-end">
-                        <a href="#user" onclick="edit()" class="btn btn-danger"><i class="fa fa-edit"></i> Edit</a>
-                    </div>
                     <form id="KaiForm" action="{{route('users_change')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" id="id" name="id" value="{{$users->id}}">
@@ -146,8 +143,8 @@
                                     <input type="text" id="username" name="username" class="form-control dis " required="" disabled  value="{{$users->username}}">
                                   </div>
                                   <div class="mb-3">
-                                    <label for="password" class="form-label text-white" id="pw">Password : <small class="text-white">kosongkan jika tidak ingin ubah password</small></label>
-                                    <input type="text" id="password" name="password" class="form-control dis " disabled>
+                                    <label for="password" class="form-label text-white" id="pw">Password Baru: </label>
+                                    <input type="text" id="password" name="password" class="form-control ">
                                   </div>  
                                   <div>
                                     <input type="submit" class="dis btn btn-primary btn-block w-100" value="Simpan Perubahan" disabled/>
@@ -170,8 +167,6 @@
 @push('js')
     <script src="./assets/js/plugins/chartjs.min.js"></script>
     <script>
-        function edit(){
-            $('.dis').attr('disabled',false);
-        }
+        
     </script>
 @endpush

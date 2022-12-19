@@ -19,7 +19,14 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navigation">
                         <ul class="navbar-nav mx-auto">
-                            
+                            @if (Auth::user()->nik==1)
+                            <li class="nav-item">
+                                <a class="nav-link me-2 {{ Route::currentRouteName() == 'admin' ? 'text-success font-weight-bolder' : '' }}" href="{{ route('admin') }}">
+                                    <i class="fas fa-home opacity-6 me-1"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            @else
                             <li class="nav-item">
                                 <a class="nav-link me-2 {{ Route::currentRouteName() == 'home' ? 'text-success font-weight-bolder' : '' }}" href="{{ route('home') }}">
                                     <i class="fas fa-home opacity-6 me-1"></i>
@@ -27,11 +34,18 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link me-2" href="{{ route('transaction') }}">
-                                    <i class="fas fa-exchange-alt opacity-6 text-dark me-1"></i>
-                                    Transaksi
+                                <a class="nav-link me-2" href="{{ route('saldo') }}">
+                                    <i class="fas fa-plus opacity-6 text-dark me-1"></i>
+                                    Tambah Saldo
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link me-2" href="{{ route('transaction') }}">
+                                    <i class="fas fa-exchange-alt opacity-6 text-dark me-1"></i>
+                                    Transfer
+                                </a>
+                            </li>
+                            @endif
                             <li class="nav-item">
                                 <a class="nav-link me-2" href="#" onclick="logout()"><i class="fas fa-power-off opacity-6 text-dark me-1"></i>
                                     Log out</a>

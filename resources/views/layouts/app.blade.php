@@ -21,6 +21,7 @@
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('assets') }}/css/argon-dashboard.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.1.3/css/jquery.orgchart.css" integrity="sha512-ND0T4MpnjKii0jtWYOcBBwkS1WrkgDbRwaHwyi/Llx6ovEI5NEx9CxmuB8c95Lv9H/LZ3USXTYtTYkDh9fNmaQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 </head>
 
 <body class="{{ $class ?? '' }}" style="min-height: 100vh">
@@ -58,6 +59,7 @@
     <script src="{{ asset('assets') }}/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="{{ asset('assets') }}/js/argon-dashboard.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.1.3/js/jquery.orgchart.min.js" ></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script>
         $('#ps-remover').removeClass('ps');
         var win = navigator.platform.indexOf('Win') > -1;

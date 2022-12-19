@@ -22,6 +22,18 @@ class TransactionsController extends Controller
         //
     }
 
+    public function admin(){
+        $user = User::where('nik','!=',1)->orderBy('status', 'asc')->get();
+        return view('pages.admin',['users'=>$user]);
+    }
+    public function verif(Request $request){
+        $user=User::updateOrCreate([
+            'id' => $request->users_id
+           ],[
+            'status'=>'verif'
+        ]);
+        return back()->with('success','Berhasil memverifikasi nasabah');
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -51,10 +63,19 @@ class TransactionsController extends Controller
      */
     public function show(Transactions $transactions)
     {
+        //recent transaksi
+        $recent = Transactions::where('users_id','=',auth()->user()->id)->join('users', 'transactions.dest', '=', 'users.card')->groupBy('dest')->orderBy('transactions.id','desc')->get();
         //get sesi dari user
         $user = auth()->user();
         //ke halaman transaksi
-        return view('pages.transaction',['user'=>$user]);
+        return view('pages.transaction',['user'=>$user,'recents'=>$recent]);
+    }
+    public function show_saldo(Transactions $transactions)
+    {
+        //get sesi dari user
+        $user = auth()->user();
+        //ke halaman transaksi
+        return view('pages.saldo',['user'=>$user]);
     }
 
     /**
@@ -181,6 +202,110 @@ class TransactionsController extends Controller
                         'dest' => $request->dest,
                         'desc' => $request->desc,
                     ]);
+                }
+                //ubah format untuk bukti transfer
+        $date = Carbon::parse($verifications->created_at)->format("Y-mm-dd");
+        $date_trans = Carbon::parse($verifications->created_at)->format("dd-M-Y");
+        $no_trans="HANBDB".$date.$verifications->id;
+        $nominal = 0;
+
+        if($verifications->debit>0){
+            $nominal = $verifications->debit;
+        }else{
+            $nominal =$verifications->credit;
+        }
+        //data akan di return
+        $ret = '<table>
+        <tbody>
+            <tr class="text-sm">
+                <td>No Trans </td>
+                <td>: '.$no_trans.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Tanggal </td>
+                <td>: '.$date_trans.'</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <p class="h5 text-success text-center">Transaksi Berhasil</p>
+    <p class="text-sm">Transaksi telah berhasil dilakukan dengan rincian sebagai berikut.</p>
+    <table>
+        <tbody>
+            <tr class="text-sm">
+                <td>Nama Penerima </td>
+                <td>: '.$dest->name.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>No Rek </td>
+                <td>: '.$dest->card.'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Nominal </td>
+                <td class="text-success font-weight-bolder">: Rp. '.number_format($nominal,0,',','.').'</td>
+            </tr>
+            <tr class="text-sm">
+                <td>Berita </td>
+                <td>: '.$verifications->desc.'</td>
+            </tr>
+        </tbody>
+    </table>
+    <small>Terus perbanyak transaksi dan rasakan kenyamanan yang terbaik dari kami.</small>
+    <hr>
+    <p class="text-center h4 font-weight-bolder text-primary">HINADADE BANK</p>';
+    //return response
+    return response()->json(['status'=> 'success', 'messages'=>'berhasil', 'data'=> $ret]);
+    }
+    public function topup(Request $request){
+        //validasi form
+        $validator = Validator::make($request->all(), [
+            'users_id' => 'required',
+            'debit' => 'required',
+            'from' => 'required',
+            'dest' => 'required',
+            'desc' => 'required',
+        ]);
+        //jika gagal
+        if ($validator->fails()) {
+            return response()->json(['status'=> "Error", 'messages'=>"", 'data'=> "Tidak dapat memvalidasi data"]);
+        }
+        //cek transaksi terakhir
+        $last=Transactions::where('users_id','=',$request->users_id)->orderBy('id','desc')->first();
+
+        //variabel saldo
+        if($last){
+            $sal=$last->saldo;
+        }else{
+            $sal=0;
+        }
+        //estimasi saldo setelah transaksi
+        $saldo = $sal+$request->debit;
+        //mengambil data tujuan
+        $dest = User::where('card','=',$request->dest)->first();
+        //ambil transaksi terakhir tujuan
+        $last2=Transactions::where('users_id','=',$dest->id)->orderBy('id','desc')->first();
+        //saldo tujuan
+                if($last){
+                    $sal2=$last2->saldo;
+                }else{
+                    $sal2=0;
+                }
+                //cek saldo masih cukup
+                if($request->debit){
+                    //input database pengirim
+                    $verifications=Transactions::updateOrCreate([
+                        'id' => $request->id
+                       ],[
+                        'users_id' => $request->users_id,
+                            'debit' => $request->debit,
+                            'credit' => 0,
+                            'saldo' => $saldo,
+                            'from' => $request->from,
+                            'dest' => $request->dest,
+                            'desc' => $request->desc,
+                    ]);
+                    $status='success';
+                    $message='Data berhasil disimpan';
                 }
                 //ubah format untuk bukti transfer
         $date = Carbon::parse($verifications->created_at)->format("Y-mm-dd");

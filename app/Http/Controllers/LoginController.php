@@ -35,6 +35,9 @@ class LoginController extends Controller
             //generate session
             $request->session()->regenerate();
             //kembali ke home
+            if(Auth::user()->nik==1){
+                return redirect()->intended('admin');
+            }
             return redirect()->intended('dashboard');
         }
         //kembali ke home dengan pesan error
