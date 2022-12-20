@@ -44,8 +44,7 @@
                                 <tr>
                                     <td>No</td>
                                     <td>Nama</td>
-                                    <td>NIK</td>
-                                    <td>No Rek</td>
+                                    <td>Email</td>
                                     <td>Status</td>
                                     <td>Action</td>
                                 </tr>
@@ -56,8 +55,7 @@
                                 <tr>
                                     <td>{{$no}}</td>
                                     <td>{{$user->name}}</td>
-                                    <td>{{$user->nik}}</td>
-                                    <td>{{$user->card}}</td>
+                                    <td>{{$user->email}}</td>
                                     <td>{{$user->status}}</td>
                                     @if ($user->status=='verif')
                                     <td class="text-center"><a href="#" class="btn btn-secondary" disabled>Sudah Verifikasi</a></td>
